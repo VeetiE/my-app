@@ -11,6 +11,9 @@ export const List =() =>{
         });
         setContent(removeItem);
     }
+    function clearList(){
+        setContent([]);
+    }
 
 
     return (
@@ -31,9 +34,18 @@ export const List =() =>{
                     />
                     <input type="submit" value="Submit"/>
                 {
-                    content.map((item, index)) 
-                }
+                    content.map((item, index) => (
+                        <ul>
+                            <li>
+                                <h2 key={index}>{item}</h2>
+                                <button onClick={() => removeHandler(index)} type="button">Remove</button>
+                            </li>
+                        </ul>
+
+                    ) 
+                )}
                 </form>
+                <button onClick={clearList}>Clear List</button>
             </div>
         </div>
     )
