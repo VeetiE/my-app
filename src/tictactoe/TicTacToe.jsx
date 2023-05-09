@@ -1,6 +1,7 @@
 import React from "react";
 import './TicTacToe.css';
 import { Board } from "./Board";
+import { Scoreboard } from "./Scoreboard";
 import { useState } from "react";
 import { useEffect } from "react";
 
@@ -10,9 +11,14 @@ export const TicTacToe = () => {
     const [gameState, setGameState] = useState(initialBoard);
     const [isXTurn, setIsXturn] = useState(true);
     const [status, setStatus] =useState('')
+    const [scores, setScores] =useState({xScore: 0, oScore: 0})
 
     const onSquareClick = (index) => {
         let strings = Array.from(gameState)
+        if (status.includes("Winner")) {
+            return
+        }
+
         if (strings[index] !== ''){
             return;
         }
@@ -24,8 +30,32 @@ export const TicTacToe = () => {
         const winner = checkWinner();
         if(winner){
             setStatus(`Winner: ${winner}`)
+        }else if (!gameState.includes('')) {
+            setStatus(`It's a draw`)
+        }else {
+            setStatus(`${isXTurn ? 'X' : 'O'}'s turn`)
         }
     })
+    useEffect(() => {
+        const winner = checkWinner();
+        if (winner===null){
+            return
+        }
+        if (winner==="X"){
+            setScores({xScore: scores.xScore + 1, oScore: scores.oScore})
+        } else {
+            setScores({xScore: scores.xScore, oScore: scores.oScore + 1})
+
+        }
+    }, [status])
+
+    function clearScoreboard(){
+        setScores({xScore:0, oScore:0})
+        setGameState(initialBoard)
+        setIsXturn(true)
+    }
+
+
 
     const checkWinner = () => {
         const lines = [
@@ -51,9 +81,33 @@ export const TicTacToe = () => {
         <div>
             <div className="game">
                 <h1>Tic-Tac-Toe</h1>
+                <Scoreboard scores={scores} />
+                <button onClick={clearScoreboard}>Clear scoreboard</button>
                 <Board gameState={gameState} onSquareClick={onSquareClick}/>
+                {status.includes("Winner") && (
+                    <>
+                        <span style={{color: "green"}}> {status} </span>
+                        <button style={{background: "green"}} onClick={() => {
+                            setGameState(initialBoard);
+                            setIsXturn(true);
+                        }
+                        }>Play again</button>
+                    </>
+                )
+                }
+                {!status.includes("Winner") && (
+                    <>
+                        <span> {status} </span>
+                        <button onClick={() => {
+                            setGameState(initialBoard);
+                            setIsXturn(true);
+                        }
+                        }>Clear board</button>
+                    </>
+                )
+                }
             </div>
-            {status}
+            
         </div>
     );
 }
